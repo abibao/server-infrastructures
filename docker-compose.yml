@@ -14,7 +14,18 @@ services:
       - ./docker/nginx/log:/var/log/nginx
     networks:
       infra:
-        ipv4_address: 172.15.0.2
+        ipv4_address: 172.15.0.21
+
+  nginx-proxy-companion:
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    volumes:
+        - ./docker/nginx/certs:/etc/nginx/certs:rw
+        - /var/run/docker.sock:/var/run/docker.sock
+    volumes_from:
+        - nginx
+    networks:
+      infra:
+        ipv4_address: 172.15.0.22
 
   portainer:
     image: portainer/portainer
