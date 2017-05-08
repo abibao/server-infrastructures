@@ -1,0 +1,4 @@
+temp
+docker/elasticsearch/data
+docker/portainer/data
+docker/nginx/log
