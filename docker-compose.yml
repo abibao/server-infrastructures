@@ -3,46 +3,34 @@ version: "2"
 services:
 
   nginx:
-    image: nginx:1.13.0-alpine
-    container_name: "nginx-service"
-    privileged: true
+    image: library/nginx:1.11.0-alpine
+    container_name: infra_nginx
     volumes:
-      - ./docker/nginx/sites-available:/etc/nginx/sites-available
-      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf
-      - ./docker/nginx/conf.d:/etc/nginx/conf.d
-      - ./docker/nginx/conf.s:/etc/nginx/conf.s
-      - ./docker/nginx/log:/var/log/nginx
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./docker/nginx/ssl:/etc/nginx/ssl:ro
+      - ./docker/nginx/sites-available:/etc/nginx/sites-available:ro
+      - ./volumes/nginx/log:/var/log/nginx
+    ports:
+      - 80:80
+      - 443:443
     networks:
       infra:
-        ipv4_address: 172.15.0.21
-
-  nginx-proxy-companion:
-    image: jrcs/letsencrypt-nginx-proxy-companion
-    volumes:
-        - ./docker/nginx/certs:/etc/nginx/certs:rw
-        - /var/run/docker.sock:/var/run/docker.sock
-    volumes_from:
-        - nginx
-    networks:
-      infra:
-        ipv4_address: 172.15.0.22
+        ipv4_address: 172.45.0.3
 
   portainer:
     image: portainer/portainer
-    container_name: "portainer-service"
-    command: --templates http://templates/templates.json
+    container_name: infra_portainer
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./docker/portainer/data:/data
+      - ./volumes/portainer/data:/data
     networks:
       infra:
-        ipv4_address: 172.15.0.3
+        ipv4_address: 172.45.0.4
 
   elasticsearch:
-    build: docker/elasticsearch/
-    image: abibao/elasticsearch:5.4.0
-    container_name: "elasticsearch-service"
-    privileged: true
+    build: ./docker/elasticsearch/
+    container_name: infra_elasticsearch
     environment:
       ES_JAVA_OPTS: "-Xmx256m -Xms256m"
       xpack.security.enabled: "false"
@@ -50,39 +38,76 @@ services:
       xpack.graph.enabled: "false"
       xpack.watcher.enabled: "false"
     volumes:
-      - ./docker/elasticsearch/data:/usr/share/elasticsearch/data
+      - esdata:/usr/share/elasticsearch/data
     networks:
       infra:
-        ipv4_address: 172.15.0.4
+        ipv4_address: 172.45.0.13
 
   logstash:
-    build: docker/logstash/
-    image: abibao/logstash:5.4.0
-    container_name: "logstash-service"
+    build: ./docker/logstash/
+    container_name: infra_logstash
     volumes:
       - ./docker/logstash/conf.d:/etc/logstash/conf.d
-      - ./docker/nginx/log:/var/log/nginx
       - ./docker/logstash/patterns:/opt/logstash/patterns
+      - ./volumes/nginx/log:/var/log/nginx:ro
     command: -f /etc/logstash/conf.d/
     environment:
       LS_JAVA_OPTS: "-Xmx256m -Xms256m"
-    networks:
-      infra:
-        ipv4_address: 172.15.0.5
     depends_on:
       - elasticsearch
+    networks:
+      infra:
+        ipv4_address: 172.45.0.12
 
   kibana:
-    build: docker/kibana/
-    image: abibao/kibana:5.4.0
-    container_name: "kibana-service"
+    build: ./docker/kibana/
+    container_name: infra_kibana
     volumes:
-      - ./docker/kibana/config/:/usr/share/kibana/config
-    networks:
-      infra:
-        ipv4_address: 172.15.0.6
+      - ./docker/kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml:ro
     depends_on:
       - elasticsearch
+    networks:
+      infra:
+        ipv4_address: 172.45.0.11
+
+  couchdb:
+    image: library/couchdb:1.6
+    container_name: infra_couchdb
+    environment:
+      COUCHDB_USER: infra
+      COUCHDB_PASSWORD: infra
+    volumes:
+      - ./docker/couchdb/default.d:/usr/local/etc/couchdb/default.d
+      - ./volumes/couchdb:/usr/local/var/lib/couchdb
+    networks:
+      infra:
+        ipv4_address: 172.45.0.21
+
+  postgres:
+    image: library/postgres:9.5-alpine
+    container_name: infra_postgres
+    environment:
+      POSTGRES_USER: infra
+      POSTGRES_PASSWORD: infra
+    volumes:
+      - ./volumes/postgresql/data:/var/lib/postgresql/data
+    networks:
+      infra:
+        ipv4_address: 172.45.0.22
+        
+  rabbitmq:
+    image: library/rabbitmq:3.6-management-alpine
+    container_name: infra_rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: infra
+      RABBITMQ_DEFAULT_PASS: infra
+    networks:
+      infra:
+        ipv4_address: 172.45.0.31
+
+volumes:
+  esdata:
+    driver: local
 
 networks:
   infra:
@@ -90,5 +115,5 @@ networks:
     ipam:
       driver: default
       config:
-        - subnet: 172.15.0.0/16
-          gateway: 172.15.0.1
+        - subnet: 172.45.0.0/16
+          gateway: 172.45.0.1

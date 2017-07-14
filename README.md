@@ -3,4 +3,16 @@
 ### infra tier 1
 
 - nginx
-- elk
+- portainer
+
+### infra tier 2
+
+- elasticsearch
+- logstash
+- kibana
+
+### infra tier 3
+
+- rethinkdb
+- couchdb
+- postgres
