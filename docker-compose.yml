@@ -1,19 +1,37 @@
-version: "3"
+version: "2"
 
 services:
 
-  nginx:
-    image: library/nginx:1.11.0-alpine
-    container_name: infra_nginx
-    volumes:
-      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./docker/nginx/conf.d:/etc/nginx/conf.d:ro
-      - ./docker/nginx/ssl:/etc/nginx/ssl:ro
-      - ./docker/nginx/sites-available:/etc/nginx/sites-available:ro
-      - ./volumes/nginx/log:/var/log/nginx
+  nginx-proxy:
+    image: jwilder/nginx-proxy:alpine
+    container_name: infra_nginx_proxy
+    labels:
+      - com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy
     ports:
-      - 80:80
-      - 443:443
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./volumes/nginx/certs:/etc/nginx/certs:ro
+      - ./volumes/nginx/vhost.d:/etc/nginx/vhost.d
+      - ./volumes/nginx/log:/etc/nginx/log
+      - ./volumes/nginx/html:/usr/share/nginx/html
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    environment:
+      - ENABLE_IPV6=true
+    networks:
+      - intranet
+
+  letsencrypt:
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    restart: always
+    container_name: infra_letsencrypt
+    volumes_from:
+      - nginx-proxy
+    volumes:
+      - ./volumes/nginx/certs:/etc/nginx/certs:rw
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - intranet
 
   portainer:
     image: portainer/portainer
@@ -21,49 +39,27 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./volumes/portainer/data:/data
+    environment:
+      - VIRTUAL_HOST=abibao.portainer.127.0.0.1.xip.io
+      - LETSENCRYPT_HOST=abibao.portainer.127.0.0.1.xip.io
+      - LETSENCRYPT_EMAIL=team@abibao.com
+    networks:
+      - intranet
 
   composeui:
     image: francescou/docker-compose-ui:1.8.0
     container_name: infra_composeui
+    working_dir: $PWD/docker/composeui
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./docker/composeui:/opt/docker-compose-projects:ro
-
-  cadvisor:
-    image: google/cadvisor:latest
-    container_name: infra_cadvisor
-    volumes:
-      - /var/lib/docker/:/var/lib/docker:ro
-      - /sys:/sys:ro
-      - /var/run:/var/run:rw
-      - /:/rootfs:ro
-
-  couchdb:
-    image: library/couchdb:1.6
-    container_name: infra_couchdb
+      - $PWD/docker/composeui:$PWD/docker/composeui
     environment:
-      COUCHDB_USER: infra
-      COUCHDB_PASSWORD: infra
-    volumes:
-      - ./docker/couchdb/default.d:/usr/local/etc/couchdb/default.d
-      - ./volumes/couchdb:/usr/local/var/lib/couchdb
+      - VIRTUAL_HOST=abibao.composeui.127.0.0.1.xip.io
+      - LETSENCRYPT_HOST=abibao.composeui.127.0.0.1.xip.io
+      - LETSENCRYPT_EMAIL=team@abibao.com
+    networks:
+      - intranet
 
-  postgres:
-    image: library/postgres:9.5-alpine
-    container_name: infra_postgres
-    environment:
-      POSTGRES_USER: infra
-      POSTGRES_PASSWORD: infra
-    volumes:
-      - ./volumes/postgresql/data:/var/lib/postgresql/data
-
-  rabbitmq:
-    image: library/rabbitmq:3.6-management-alpine
-    container_name: infra_rabbitmq
-    environment:
-      RABBITMQ_DEFAULT_USER: infra
-      RABBITMQ_DEFAULT_PASS: infra
-
-volumes:
-  esdata:
-    driver: local
+networks:
+  intranet:
+    driver: bridge
