@@ -1,0 +1,36 @@
+version: "3"
+
+services:
+
+  elasticsearch:
+    build: ./docker/elasticsearch/
+    container_name: infra_elasticsearch
+    environment:
+      ES_JAVA_OPTS: "-Xmx256m -Xms256m"
+      xpack.security.enabled: "false"
+      xpack.monitoring.enabled: "false"
+      xpack.graph.enabled: "false"
+      xpack.watcher.enabled: "false"
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+
+  logstash:
+    build: ./docker/logstash/
+    container_name: infra_logstash
+    volumes:
+      - ./docker/logstash/conf.d:/etc/logstash/conf.d
+      - ./docker/logstash/patterns:/opt/logstash/patterns
+      - ./volumes/nginx/log:/var/log/nginx:ro
+    command: -f /etc/logstash/conf.d/
+    environment:
+      LS_JAVA_OPTS: "-Xmx256m -Xms256m"
+    depends_on:
+      - elasticsearch
+
+  kibana:
+    build: ./docker/kibana/
+    container_name: infra_kibana
+    volumes:
+      - ./docker/kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml:ro
+    depends_on:
+      - elasticsearch

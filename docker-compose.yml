@@ -1,4 +1,4 @@
-version: "2"
+version: "3"
 
 services:
 
@@ -14,9 +14,6 @@ services:
     ports:
       - 80:80
       - 443:443
-    networks:
-      infra:
-        ipv4_address: 172.45.0.3
 
   portainer:
     image: portainer/portainer
@@ -24,51 +21,22 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./volumes/portainer/data:/data
-    networks:
-      infra:
-        ipv4_address: 172.45.0.4
 
-  elasticsearch:
-    build: ./docker/elasticsearch/
-    container_name: infra_elasticsearch
-    environment:
-      ES_JAVA_OPTS: "-Xmx256m -Xms256m"
-      xpack.security.enabled: "false"
-      xpack.monitoring.enabled: "false"
-      xpack.graph.enabled: "false"
-      xpack.watcher.enabled: "false"
+  composeui:
+    image: francescou/docker-compose-ui:1.8.0
+    container_name: infra_composeui
     volumes:
-      - esdata:/usr/share/elasticsearch/data
-    networks:
-      infra:
-        ipv4_address: 172.45.0.13
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./docker/composeui:/opt/docker-compose-projects:ro
 
-  logstash:
-    build: ./docker/logstash/
-    container_name: infra_logstash
+  cadvisor:
+    image: google/cadvisor:latest
+    container_name: infra_cadvisor
     volumes:
-      - ./docker/logstash/conf.d:/etc/logstash/conf.d
-      - ./docker/logstash/patterns:/opt/logstash/patterns
-      - ./volumes/nginx/log:/var/log/nginx:ro
-    command: -f /etc/logstash/conf.d/
-    environment:
-      LS_JAVA_OPTS: "-Xmx256m -Xms256m"
-    depends_on:
-      - elasticsearch
-    networks:
-      infra:
-        ipv4_address: 172.45.0.12
-
-  kibana:
-    build: ./docker/kibana/
-    container_name: infra_kibana
-    volumes:
-      - ./docker/kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml:ro
-    depends_on:
-      - elasticsearch
-    networks:
-      infra:
-        ipv4_address: 172.45.0.11
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /sys:/sys:ro
+      - /var/run:/var/run:rw
+      - /:/rootfs:ro
 
   couchdb:
     image: library/couchdb:1.6
@@ -79,9 +47,6 @@ services:
     volumes:
       - ./docker/couchdb/default.d:/usr/local/etc/couchdb/default.d
       - ./volumes/couchdb:/usr/local/var/lib/couchdb
-    networks:
-      infra:
-        ipv4_address: 172.45.0.21
 
   postgres:
     image: library/postgres:9.5-alpine
@@ -91,29 +56,14 @@ services:
       POSTGRES_PASSWORD: infra
     volumes:
       - ./volumes/postgresql/data:/var/lib/postgresql/data
-    networks:
-      infra:
-        ipv4_address: 172.45.0.22
-        
+
   rabbitmq:
     image: library/rabbitmq:3.6-management-alpine
     container_name: infra_rabbitmq
     environment:
       RABBITMQ_DEFAULT_USER: infra
       RABBITMQ_DEFAULT_PASS: infra
-    networks:
-      infra:
-        ipv4_address: 172.45.0.31
 
 volumes:
   esdata:
     driver: local
-
-networks:
-  infra:
-    driver: bridge
-    ipam:
-      driver: default
-      config:
-        - subnet: 172.45.0.0/16
-          gateway: 172.45.0.1
