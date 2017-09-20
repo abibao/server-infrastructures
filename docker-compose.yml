@@ -4,7 +4,7 @@ services:
 
   nginx-proxy:
     image: jwilder/nginx-proxy:alpine
-    container_name: infra_nginx_proxy
+    container_name: infra_default_nginx_proxy
     labels:
       - com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy
     ports:
@@ -16,15 +16,13 @@ services:
       - ./volumes/nginx/log:/etc/nginx/log
       - ./volumes/nginx/html:/usr/share/nginx/html
       - /var/run/docker.sock:/tmp/docker.sock:ro
-    environment:
-      - ENABLE_IPV6=true
     networks:
       - intranet
 
   letsencrypt:
     image: jrcs/letsencrypt-nginx-proxy-companion
     restart: always
-    container_name: infra_letsencrypt
+    container_name: infra_default_letsencrypt
     volumes_from:
       - nginx-proxy
     volumes:
@@ -35,7 +33,7 @@ services:
 
   portainer:
     image: portainer/portainer
-    container_name: infra_portainer
+    container_name: infra_default_portainer
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./volumes/portainer/data:/data
@@ -48,7 +46,7 @@ services:
 
   composeui:
     image: francescou/docker-compose-ui:1.8.0
-    container_name: infra_composeui
+    container_name: infra_default_composeui
     working_dir: $PWD/docker/composeui
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
