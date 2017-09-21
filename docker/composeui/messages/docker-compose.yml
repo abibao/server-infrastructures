@@ -1,0 +1,20 @@
+version: "2"
+
+services:
+
+  rabbitmq:
+    image: rabbitmq:3.6-management-alpine
+    networks:
+      - proxy
+    environment:
+      VIRTUAL_HOST: abibao.rabbitmq.127.0.0.1.xip.io
+      VIRTUAL_PORT: 15672
+      LETSENCRYPT_HOST: abibao.rabbitmq.127.0.0.1.xip.io
+      LETSENCRYPT_EMAIL: team@abibao.com
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+
+networks:
+  proxy:
+    external:
+      name: serverinfrastructures_intranet
