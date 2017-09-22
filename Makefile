@@ -1,13 +1,9 @@
-.PHONY: default up down logs
+.PHONY: default up down;
 
 default: up
 
 up:
-	docker-compose pull;
-	docker-compose up -d;
+	docker stack deploy --compose-file=docker-compose.yml infra;
 
 down:
-	docker-compose down;
-
-logs:
-	docker-compose logs;
+	docker stack rm infra;

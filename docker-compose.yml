@@ -1,39 +1,32 @@
-version: "2"
+version: "3"
 
 services:
 
   nginx-proxy:
     image: jwilder/nginx-proxy:alpine
-    container_name: infra_default_nginx_proxy
     labels:
       - com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy
     ports:
-      - "80:80"
-      - "443:443"
+      - 80:80
+      - 443:443
     volumes:
       - ./volumes/nginx/certs:/etc/nginx/certs:ro
       - ./volumes/nginx/vhost.d:/etc/nginx/vhost.d
       - ./volumes/nginx/log:/etc/nginx/log
       - ./volumes/nginx/html:/usr/share/nginx/html
       - /var/run/docker.sock:/tmp/docker.sock:ro
-    networks:
-      - intranet
 
   letsencrypt:
     image: jrcs/letsencrypt-nginx-proxy-companion
-    restart: always
-    container_name: infra_default_letsencrypt
-    volumes_from:
-      - nginx-proxy
     volumes:
       - ./volumes/nginx/certs:/etc/nginx/certs:rw
+      - ./volumes/nginx/vhost.d:/etc/nginx/vhost.d
+      - ./volumes/nginx/log:/etc/nginx/log
+      - ./volumes/nginx/html:/usr/share/nginx/html
       - /var/run/docker.sock:/var/run/docker.sock:ro
-    networks:
-      - intranet
 
   portainer:
     image: portainer/portainer
-    container_name: infra_default_portainer
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./volumes/portainer/data:/data
@@ -41,22 +34,6 @@ services:
       - VIRTUAL_HOST=abibao.portainer.127.0.0.1.xip.io
       - LETSENCRYPT_HOST=abibao.portainer.127.0.0.1.xip.io
       - LETSENCRYPT_EMAIL=team@abibao.com
-    networks:
-      - intranet
-
-  composeui:
-    image: francescou/docker-compose-ui:1.8.0
-    container_name: infra_default_composeui
-    working_dir: $PWD/docker/composeui
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - $PWD/docker/composeui:$PWD/docker/composeui
-    environment:
-      - VIRTUAL_HOST=abibao.composeui.127.0.0.1.xip.io
-      - LETSENCRYPT_HOST=abibao.composeui.127.0.0.1.xip.io
-      - LETSENCRYPT_EMAIL=team@abibao.com
-    networks:
-      - intranet
 
 networks:
   intranet:
