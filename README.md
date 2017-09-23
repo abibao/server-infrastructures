@@ -1,8 +1,13 @@
 # server-infrastructures
 
+### docker plugins
+
+- https://github.com/CWSpear/local-persist
+
 ### infra tier 1
 
-- nginx
+- nginx-proxy
+- letsencrypt
 - portainer
 
 ### infra tier 2
