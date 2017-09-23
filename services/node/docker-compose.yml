@@ -1,0 +1,21 @@
+version: "3.2"
+
+services:
+
+  modules:
+    build: .
+    command: "tail -f /usr/app/package.json"
+    volumes:
+      - volumes-data-node-modules:/usr/app/node_modules
+
+volumes:
+
+  volumes-data-node-modules:
+    driver: local-persist
+    driver_opts:
+      mountpoint: $PWD/volumes/data-persist/node_modules
+
+networks:
+  proxy:
+    external:
+      name: serverinfrastructures_default

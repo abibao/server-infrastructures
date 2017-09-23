@@ -1,0 +1,15 @@
+{
+  "name": "modules",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 0"
+  },
+  "author": "",
+  "dependencies": {
+    "async": "2.5.0",
+    "bluebird": "3.5.0",
+    "lodash": "4.17.4",
+    "node-cqrs-framework": "1.2.1"
+  }
+}
