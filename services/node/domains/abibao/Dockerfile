@@ -6,4 +6,5 @@ RUN mkdir -p /usr/app
 WORKDIR /usr/app
 
 COPY .tail /usr/app/.tail
-COPY package.json /usr/app/package.json
+COPY commands /usr/app/domain/commands
+COPY queries /usr/app/domain/queries

@@ -2,9 +2,19 @@ version: "3.2"
 
 services:
 
+  abibao:
+    build: ./domains/abibao
+    networks:
+      - proxy
+    command: "tail -f /usr/app/.tail"
+    volumes:
+      - volumes-data-node-modules:/usr/app/node_modules:ro
+
   modules:
     build: .
-    command: "tail -f /usr/app/package.json"
+    networks:
+      - proxy
+    command: "tail -f /usr/app/.tail"
     volumes:
       - volumes-data-node-modules:/usr/app/node_modules
 
