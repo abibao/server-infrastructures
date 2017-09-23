@@ -1,10 +1,11 @@
-version: "2"
+version: "3.2"
 
 services:
 
   elasticsearch:
     build: ./elasticsearch/
-    container_name: infra_elk_elasticsearch
+    volumes:
+      - volumes-data-elasticsearch-data:/usr/share/elasticsearch/data
     environment:
       ES_JAVA_OPTS: "-Xmx256m -Xms256m"
       xpack.security.enabled: "false"
@@ -16,11 +17,9 @@ services:
 
   logstash:
     build: ./logstash/
-    container_name: infra_elk_logstash
     volumes:
       - ./logstash/conf.d:/etc/logstash/conf.d
       - ./logstash/patterns:/opt/logstash/patterns
-      - ./../../../volumes/nginx/log:/var/log/nginx:ro
     command: -f /etc/logstash/conf.d/
     environment:
       LS_JAVA_OPTS: "-Xmx256m -Xms256m"
@@ -31,7 +30,6 @@ services:
 
   kibana:
     build: ./kibana/
-    container_name: infra_elk_kibana
     volumes:
       - ./kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml:ro
     depends_on:
@@ -40,11 +38,19 @@ services:
     networks:
       - proxy
     environment:
-      - VIRTUAL_HOST=abibao.kibana.127.0.0.1.xip.io
-      - LETSENCRYPT_HOST=abibao.kibana.127.0.0.1.xip.io
-      - LETSENCRYPT_EMAIL=team@abibao.com
+      VIRTUAL_HOST: abibao.kibana.127.0.0.1.xip.io
+      VIRTUAL_PORT: 5601
+      LETSENCRYPT_HOST: abibao.kibana.127.0.0.1.xip.io
+      LETSENCRYPT_EMAIL: team@abibao.com
+
+volumes:
+
+  volumes-data-elasticsearch-data:
+    driver: local-persist
+    driver_opts:
+      mountpoint: $PWD/volumes/data-persist/elasticsearch/data
 
 networks:
   proxy:
     external:
-      name: serverinfrastructures_intranet
+      name: serverinfrastructures_default

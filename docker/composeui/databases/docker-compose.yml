@@ -1,32 +1,44 @@
-version: "2"
+version: "3.2"
 
 services:
 
     postgres:
       image: library/postgres:9.5-alpine
-      container_name: infra_databases_postgres
       environment:
-        - POSTGRES_USER=infra
-        - POSTGRES_PASSWORD=infra
-        - POSTGRES_DB=infra
+        POSTGRES_USER: infra
+        POSTGRES_PASSWORD: infra
+        POSTGRES_DB: infra
       networks:
         - proxy
       volumes:
-        - ./../../../volumes/postgresql/data:/var/lib/postgresql/data
+        - volumes-data-postgres-data:/var/lib/postgresql/data
 
     couchdb:
       image: library/couchdb:1.6
-      container_name: infra_databases_couchdb
       environment:
-        - COUCHDB_USER=infra
-        - COUCHDB_PASSWORD=infra
+        COUCHDB_USER: infra
+        COUCHDB_PASSWORD: infra
+        VIRTUAL_HOST: abibao.couchdb.127.0.0.1.xip.io
+        VIRTUAL_PORT: 5984
       networks:
         - proxy
       volumes:
+        - volumes-data-couchdb-data:/usr/local/var/lib/couchdb
         - ./couchdb/default.d:/usr/local/etc/couchdb/default.d
-        - ./../../../volumes/couchdb:/usr/local/var/lib/couchdb
+
+volumes:
+
+  volumes-data-postgres-data:
+    driver: local-persist
+    driver_opts:
+      mountpoint: $PWD/volumes/data-persist/postgres/data
+
+  volumes-data-couchdb-data:
+    driver: local-persist
+    driver_opts:
+      mountpoint: $PWD/volumes/data-persist/couchdb/data
 
 networks:
   proxy:
     external:
-      name: serverinfrastructures_intranet
+      name: serverinfrastructures_default

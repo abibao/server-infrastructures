@@ -1,4 +1,4 @@
-version: "2"
+version: "3.2"
 
 services:
 
@@ -11,10 +11,10 @@ services:
       VIRTUAL_PORT: 15672
       LETSENCRYPT_HOST: abibao.rabbitmq.127.0.0.1.xip.io
       LETSENCRYPT_EMAIL: team@abibao.com
-      RABBITMQ_DEFAULT_USER: guest
-      RABBITMQ_DEFAULT_PASS: guest
+      RABBITMQ_DEFAULT_USER: infra
+      RABBITMQ_DEFAULT_PASS: infra
 
 networks:
   proxy:
     external:
-      name: serverinfrastructures_intranet
+      name: serverinfrastructures_default
