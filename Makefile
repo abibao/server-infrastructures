@@ -1,4 +1,4 @@
-.PHONY: default up down services services_node services_messages services_databases services_elk;
+.PHONY: default up down build services_applications services_messages services_databases services_elk;
 
 default: up
 
@@ -17,12 +17,9 @@ services_databases:
 services_elk:
 	docker-compose -f $(PWD)/services/elk/docker-compose.yml up -d;
 
-services:
-	make services_messages;
-	make services_databases;
-	make services_elk;
+services_applications:
+	docker stack deploy -c $(PWD)/services/applications/docker-compose.yml applications;
 
-services_node:
-	docker-compose -f $(PWD)/services/node/docker-compose.yml up -d --build;
-	docker-compose -f $(PWD)/services/node/docker-compose.yml exec modules npm prune;
-	docker-compose -f $(PWD)/services/node/docker-compose.yml exec modules npm install;
+build:
+	docker build -t abibao/node_dependencies -f $(PWD)/dependencies/Dockerfile $(PWD)/dependencies;
+	docker push abibao/node_dependencies

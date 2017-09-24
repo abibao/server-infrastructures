@@ -5,6 +5,7 @@ MAINTAINER Gilles Perreymond <gperreymond@gmail.com>
 RUN mkdir -p /usr/app
 WORKDIR /usr/app
 
-COPY .tail /usr/app/.tail
-COPY commands /usr/app/domain/commands
-COPY queries /usr/app/domain/queries
+COPY package.json /usr/app/package.json
+RUN npm install
+
+VOLUME /usr/app/node_modules

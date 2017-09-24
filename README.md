@@ -1,5 +1,7 @@
 # server-infrastructures
 
+docker stack deploy -c docker-compose.yml example
+
 ### docker plugins
 
 - https://github.com/CWSpear/local-persist
