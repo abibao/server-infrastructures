@@ -16,6 +16,7 @@
     "hoek": "4.2.0",
     "inert": "4.2.1",
     "lodash": "4.17.4",
+    "logstash-client": "1.1.1",
     "nconf": "0.8.4",
     "node-cqrs-framework": "1.2.1",
     "pg": "7.3.0",
