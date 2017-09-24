@@ -1,6 +1,6 @@
 # server-infrastructures
 
-docker stack deploy -c docker-compose.yml example
+A complete infra for cqrs project in nodeJS used for www.abibao.com.
 
 ### docker plugins
 
@@ -11,6 +11,7 @@ docker stack deploy -c docker-compose.yml example
 - nginx-proxy
 - letsencrypt
 - portainer
+- jenkins
 
 ### infra tier 2
 
@@ -20,6 +21,10 @@ docker stack deploy -c docker-compose.yml example
 
 ### infra tier 3
 
-- rethinkdb
+- memcached
 - couchdb
 - postgres
+
+### infra tier 4
+
+- applications (microservices cqrs)

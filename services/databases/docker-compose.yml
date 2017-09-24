@@ -2,6 +2,11 @@ version: "3.2"
 
 services:
 
+    memcached:
+      image: library/memcached:1.5-alpine
+      networks:
+        - proxy
+        
     postgres:
       image: library/postgres:9.5-alpine
       environment:

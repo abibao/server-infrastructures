@@ -37,7 +37,22 @@ services:
       LETSENCRYPT_HOST: abibao.portainer.127.0.0.1.xip.io
       LETSENCRYPT_EMAIL: team@abibao.com
 
+  jenkins:
+    image: library/jenkins:alpine
+    volumes:
+      - volumes-data-jenkins:/var/jenkins_home
+    environment:
+      VIRTUAL_HOST: abibao.jenkins.127.0.0.1.xip.io
+      VIRTUAL_PORT: 8080
+      LETSENCRYPT_HOST: abibao.jenkins.127.0.0.1.xip.io
+      LETSENCRYPT_EMAIL: team@abibao.com
+
 volumes:
+
+  volumes-data-jenkins:
+    driver: local-persist
+    driver_opts:
+      mountpoint: $PWD/volumes/data-persist/jenkins
 
   volumes-data-nginx-certs:
     driver: local-persist
