@@ -6,7 +6,7 @@ services:
       image: library/memcached:1.5-alpine
       networks:
         - proxy
-        
+
     postgres:
       image: library/postgres:9.5-alpine
       environment:
@@ -31,6 +31,16 @@ services:
         - volumes-data-couchdb-data:/usr/local/var/lib/couchdb
         - ./couchdb/default.d:/usr/local/etc/couchdb/default.d
 
+    rethinkdb:
+      image: pdonorio/rethinkdb:alpine
+      environment:
+        VIRTUAL_HOST: abibao.rethinkdb.127.0.0.1.xip.io
+        VIRTUAL_PORT: 8080
+      networks:
+        - proxy
+      volumes:
+        - volumes-data-rethinkdb-data:/data
+
 volumes:
 
   volumes-data-postgres-data:
@@ -42,6 +52,11 @@ volumes:
     driver: local-persist
     driver_opts:
       mountpoint: $PWD/volumes/data-persist/couchdb/data
+
+  volumes-data-rethinkdb-data:
+    driver: local-persist
+    driver_opts:
+      mountpoint: $PWD/volumes/data-persist/rethinkdb/data
 
 networks:
   proxy:
