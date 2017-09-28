@@ -61,4 +61,4 @@ volumes:
 networks:
   proxy:
     external:
-      name: serverinfrastructures_default
+      name: communs_default

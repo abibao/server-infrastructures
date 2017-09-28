@@ -1,0 +1,71 @@
+#!/bin/sh
+set -e
+
+COMMAND="help"
+
+usage() {
+  echo " "
+  echo "Usage: abibao COMMAND"
+  echo " "
+  echo "Options:"
+  echo " "
+  echo "Commands:"
+  echo "  abibao help                      Display this help message."
+  echo "  abibao version                   Display the script version."
+  echo "  abibao start                     Start a service."
+  echo " "
+}
+
+version() {
+  echo " "
+  echo "Services:"
+  echo "  Version:      1.0.0"
+  echo "  OS/Arch:      linux/amd64"
+  echo " "
+}
+
+while [ "$1" != "" ]; do
+    COMMAND=$1
+    VALUE=$2
+    case $COMMAND in
+      help)
+        usage
+        exit
+        ;;
+      version)
+        version
+        exit
+        ;;
+      start)
+        echo $COMMAND
+        docker-compose -f $(pwd)/services/$VALUE/docker-compose.yml up -d;
+        exit
+        ;;
+      *)
+        echo "ERROR: unknown parameter \"$COMMAND\""
+        usage
+        exit 1
+        ;;
+    esac
+    shift
+done
+
+# default: version
+
+# version:
+	# docker version;
+
+# start:
+	# ifeq ($(global))
+		# docker-compose up -d;
+	# endif
+	# ifeq ($(databases))
+		# docker-compose -f $(PWD)/databases/docker-compose.yml up -d;
+	# endif
+
+# services_applications:
+	# docker stack deploy -c $(PWD)/services/applications/docker-compose.yml applications;
+
+# build:
+	# docker build -t abibao/node_dependencies -f $(PWD)/dependencies/Dockerfile $(PWD)/dependencies;
+	# docker push abibao/node_dependencies
