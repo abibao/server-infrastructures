@@ -5,6 +5,7 @@ A complete infra for cqrs project in nodeJS used for www.abibao.com.
 ### docker plugins
 
 - https://github.com/CWSpear/local-persist
+- https://github.com/docopt/docopt
 
 ### infra tier 1
 

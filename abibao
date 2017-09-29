@@ -1,71 +1,25 @@
-#!/bin/sh
-set -e
+#!/usr/bin/python
 
-COMMAND="help"
+"""Abibao Services.
 
-usage() {
-  echo " "
-  echo "Usage: abibao COMMAND"
-  echo " "
-  echo "Options:"
-  echo " "
-  echo "Commands:"
-  echo "  abibao help                      Display this help message."
-  echo "  abibao version                   Display the script version."
-  echo "  abibao start                     Start a service."
-  echo " "
-}
+Usage:
+  abibao help
+  abibao version
+  abibao start (local|rece|prod)
 
-version() {
-  echo " "
-  echo "Services:"
-  echo "  Version:      1.0.0"
-  echo "  OS/Arch:      linux/amd64"
-  echo " "
-}
+Arguments:
 
-while [ "$1" != "" ]; do
-    COMMAND=$1
-    VALUE=$2
-    case $COMMAND in
-      help)
-        usage
-        exit
-        ;;
-      version)
-        version
-        exit
-        ;;
-      start)
-        echo $COMMAND
-        docker-compose -f $(pwd)/services/$VALUE/docker-compose.yml up -d;
-        exit
-        ;;
-      *)
-        echo "ERROR: unknown parameter \"$COMMAND\""
-        usage
-        exit 1
-        ;;
-    esac
-    shift
-done
+Options:
 
-# default: version
+"""
+from docopt import docopt
+import os
 
-# version:
-	# docker version;
+if __name__ == '__main__':
+    arguments = docopt(__doc__, version="Abibao Services 2.0.0")
+    print(arguments)
 
-# start:
-	# ifeq ($(global))
-		# docker-compose up -d;
-	# endif
-	# ifeq ($(databases))
-		# docker-compose -f $(PWD)/databases/docker-compose.yml up -d;
-	# endif
+    os.environ['SERVICE_ENV'] = 'local'
 
-# services_applications:
-	# docker stack deploy -c $(PWD)/services/applications/docker-compose.yml applications;
-
-# build:
-	# docker build -t abibao/node_dependencies -f $(PWD)/dependencies/Dockerfile $(PWD)/dependencies;
-	# docker push abibao/node_dependencies
+    cmd = 'docker-compose --file=' + os.getcwd() + '/services/communs/docker-compose.yml up -d'
+    os.system(cmd)
