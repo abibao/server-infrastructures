@@ -26,18 +26,13 @@ services:
   portainer:
     image: portainer/portainer
     env_file:
-      - $PWD/environments/$SERVICE_ENV/communs.env
+      - ${PWD}/environments/${SERVICE_ENV}/portainer.env
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - volumes-data-portainer:/data
     deploy:
       placement:
         constraints: [node.role == manager]
-    environment:
-      VIRTUAL_HOST: ${PORTAINER_VIRTUAL_HOST}
-      VIRTUAL_PORT: 9000
-      LETSENCRYPT_HOST: ${PORTAINER_VIRTUAL_HOST}
-      LETSENCRYPT_EMAIL: team@abibao.com
 
   jenkins:
     image: library/jenkins:alpine

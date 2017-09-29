@@ -5,7 +5,8 @@
 Usage:
   abibao help
   abibao version
-  abibao start (local|rece|prod)
+  abibao start [<service>] [--env=<environment>]
+  abibao stop [<service>]
 
 Arguments:
 
@@ -13,13 +14,22 @@ Options:
 
 """
 from docopt import docopt
+
 import os
+
+def setenv(args):
+    if args['--env'] == None:
+        os.environ['SERVICE_ENV'] = 'deve'
+    else:
+        os.environ['SERVICE_ENV'] = args['--env']
 
 if __name__ == '__main__':
     arguments = docopt(__doc__, version="Abibao Services 2.0.0")
-    print(arguments)
+    
+    setenv(arguments)
 
-    os.environ['SERVICE_ENV'] = 'local'
+    if arguments['start'] == True:
+        os.system('docker-compose --file=' + os.getcwd() + '/services/' + arguments['<service>'] + '/docker-compose.yml up -d')
 
-    cmd = 'docker-compose --file=' + os.getcwd() + '/services/communs/docker-compose.yml up -d'
-    os.system(cmd)
+    if arguments['stop'] == True:
+        os.system('docker-compose --file=' + os.getcwd() + '/services/' + arguments['<service>'] + '/docker-compose.yml down')
