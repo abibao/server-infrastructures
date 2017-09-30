@@ -1,0 +1,24 @@
+version: "3.2"
+
+services:
+
+  cms-abibao:
+    image: abibao/grav
+    env_file:
+      - ${PWD}/environments/${SERVICE_ENV}/cms-abibao.env
+    networks:
+      - proxy
+    volumes:
+      - volumes-data-cms-abibao:/var/www/html
+
+volumes:
+
+  volumes-data-cms-abibao:
+    driver: local-persist
+    driver_opts:
+      mountpoint: $PWD/volumes/data-persist/cms_abibao
+
+networks:
+  proxy:
+    external:
+      name: communs_default

@@ -1,0 +1,28 @@
+{
+  "name": "modules-dependencies",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 0"
+  },
+  "author": "",
+  "dependencies": {
+    "async": "2.5.0",
+    "bluebird": "3.5.0",
+    "boom": "5.2.0",
+    "fs-extra": "4.0.2",
+    "good": "7.3.0",
+    "hapi": "16.6.0",
+    "hoek": "4.2.0",
+    "inert": "4.2.1",
+    "lodash": "4.17.4",
+    "logstash-client": "1.1.1",
+    "nconf": "0.8.4",
+    "node-cqrs-framework": "1.2.1",
+    "pg": "7.3.0",
+    "sequelize": "4.10.3",
+    "uuid": "3.1.0",
+    "vision": "4.1.1",
+    "yamljs": "0.3.0"
+  }
+}
