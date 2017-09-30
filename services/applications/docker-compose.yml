@@ -5,6 +5,8 @@ services:
   dependencies:
     image: abibao/node_dependencies
     command: "tail -F -n0 /etc/hosts"
+    networks:
+      - proxy
     volumes:
       - volumes-data-node-modules:/usr/app/node_modules
 
@@ -14,3 +16,8 @@ volumes:
     driver: local-persist
     driver_opts:
       mountpoint: $PWD/volumes/data-persist/node_modules
+
+networks:
+  proxy:
+    external:
+      name: communs_default

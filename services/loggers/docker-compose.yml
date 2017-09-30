@@ -4,23 +4,21 @@ services:
 
   elasticsearch:
     build: ./elasticsearch/
+    env_file:
+      - ${PWD}/environments/${SERVICE_ENV}/elasticsearch.env
     volumes:
+      - ./elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
       - volumes-data-elasticsearch-data:/usr/share/elasticsearch/data
     environment:
       ES_JAVA_OPTS: "-Xmx256m -Xms256m"
-      xpack.security.enabled: "false"
-      xpack.monitoring.enabled: "false"
-      xpack.graph.enabled: "false"
-      xpack.watcher.enabled: "false"
     networks:
       - proxy
 
   logstash:
     build: ./logstash/
     volumes:
-      - ./logstash/conf.d:/etc/logstash/conf.d
-      - ./logstash/patterns:/opt/logstash/patterns
-    command: -f /etc/logstash/conf.d/
+      - ./logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml
+      - ./logstash/pipeline:/usr/share/logstash/pipeline
     environment:
       LS_JAVA_OPTS: "-Xmx256m -Xms256m"
     depends_on:
@@ -30,18 +28,30 @@ services:
 
   kibana:
     build: ./kibana/
+    labels:
+      - logspout.exclude=true
+    env_file:
+      - ${PWD}/environments/${SERVICE_ENV}/kibana.env
     volumes:
-      - ./kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml:ro
+      - ./kibana/config/:/usr/share/kibana/config
     depends_on:
-      - logstash
       - elasticsearch
     networks:
       - proxy
+
+  logspout:
+    build: ./extensions/logspout/
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
     environment:
-      VIRTUAL_HOST: abibao.kibana.127.0.0.1.xip.io
-      VIRTUAL_PORT: 5601
-      LETSENCRYPT_HOST: abibao.kibana.127.0.0.1.xip.io
-      LETSENCRYPT_EMAIL: team@abibao.com
+      ROUTE_URIS: logstash://logstash:5000
+      LOGSTASH_TAGS: docker-elk
+      EXCLUDE_LABEL: logspout.exclude
+    depends_on:
+      - logstash
+    restart: on-failure
+    networks:
+      - proxy
 
 volumes:
 

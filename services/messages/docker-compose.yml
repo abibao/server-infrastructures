@@ -4,17 +4,15 @@ services:
 
   rabbitmq:
     image: rabbitmq:3.6-management-alpine
+    env_file:
+      - ${PWD}/environments/${SERVICE_ENV}/rabbitmq.env
     networks:
       - proxy
     environment:
-      VIRTUAL_HOST: abibao.rabbitmq.127.0.0.1.xip.io
-      VIRTUAL_PORT: 15672
-      LETSENCRYPT_HOST: abibao.rabbitmq.127.0.0.1.xip.io
-      LETSENCRYPT_EMAIL: team@abibao.com
       RABBITMQ_DEFAULT_USER: infra
       RABBITMQ_DEFAULT_PASS: infra
 
 networks:
   proxy:
     external:
-      name: serverinfrastructures_default
+      name: communs_default

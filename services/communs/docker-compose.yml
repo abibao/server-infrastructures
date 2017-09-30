@@ -36,13 +36,10 @@ services:
 
   jenkins:
     image: library/jenkins:alpine
+    env_file:
+      - ${PWD}/environments/${SERVICE_ENV}/jenkins.env
     volumes:
       - volumes-data-jenkins:/var/jenkins_home
-    environment:
-      VIRTUAL_HOST: abibao.jenkins.127.0.0.1.xip.io
-      VIRTUAL_PORT: 8080
-      LETSENCRYPT_HOST: abibao.jenkins.127.0.0.1.xip.io
-      LETSENCRYPT_EMAIL: team@abibao.com
 
 volumes:
 
@@ -50,6 +47,11 @@ volumes:
     driver: local-persist
     driver_opts:
       mountpoint: $PWD/volumes/data-persist/jenkins
+
+  volumes-data-nginx-logs:
+    driver: local-persist
+    driver_opts:
+      mountpoint: $PWD/volumes/data-persist/nginx/logs
 
   volumes-data-nginx-certs:
     driver: local-persist
