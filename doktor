@@ -1,0 +1,46 @@
+#!/usr/bin/python
+
+"""Doktor Services.
+
+Usage:
+  doktor help
+  doktor version
+  doktor start [<service>] [--env=<environment>]
+  doktor secret [<name>] [--env=<environment>]
+  doktor stop [<service>]
+
+Arguments:
+
+Options:
+
+"""
+from docopt import docopt
+
+import uuid
+import os
+
+def setenv(args):
+    if args["--env"] == None:
+        os.environ["SERVICE_ENV"] = "local"
+    else:
+        os.environ["SERVICE_ENV"] = args["--env"]
+
+if __name__ == "__main__":
+    arguments = docopt(__doc__, version="Abibao Services 2.0.0")
+
+    setenv(arguments)
+
+    if arguments["secret"] == True:
+        secret = uuid.uuid4().hex.upper()
+        file = open("secrets/" + arguments["<name>"], "w")
+        file.write(arguments["<name>"] + "=" + secret)
+        file.close()
+
+    if arguments["start"] == True:
+        os.system("docker-compose --file=" + os.getcwd() + "/services/" + arguments["<service>"] + "/docker-compose.yml up -d")
+
+    # if arguments["deploy"] == True:
+        # os.system("docker stack deploy --compose-file=" + os.getcwd() + "/services/" + arguments["<service>"] + "/docker-compose.yml up")
+
+    if arguments["stop"] == True:
+        os.system("docker-compose --file=" + os.getcwd() + "/services/" + arguments["<service>"] + "/docker-compose.yml down")

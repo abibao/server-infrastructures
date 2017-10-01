@@ -7,12 +7,19 @@ services:
       networks:
         - proxy
 
+    redis:
+      image: library/redis:4-alpine
+      networks:
+        - proxy
+      volumes:
+        - volumes-data-redis-data:/data
+
     postgres:
       image: library/postgres:9.5-alpine
+      env_file:
+        - ${PWD}/secrets/POSTGRES_PASSWORD
       environment:
         POSTGRES_USER: infra
-        POSTGRES_PASSWORD: infra
-        POSTGRES_DB: infra
       networks:
         - proxy
       volumes:
@@ -22,9 +29,9 @@ services:
       image: library/couchdb:1.6
       env_file:
         - ${PWD}/environments/${SERVICE_ENV}/couchdb.env
+        - ${PWD}/secrets/COUCHDB_PASSWORD
       environment:
         COUCHDB_USER: infra
-        COUCHDB_PASSWORD: infra
       networks:
         - proxy
       volumes:
@@ -41,6 +48,11 @@ services:
         - volumes-data-rethinkdb-data:/data
 
 volumes:
+
+  volumes-data-redis-data:
+    driver: local-persist
+    driver_opts:
+      mountpoint: $PWD/volumes/data-persist/redis/data
 
   volumes-data-postgres-data:
     driver: local-persist

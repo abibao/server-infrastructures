@@ -1,0 +1,8 @@
+#!/bin/sh
+
+./gen-secrets
+
+./doktor start communs
+./doktor start loggers
+./doktor start databases
+./doktor start messages

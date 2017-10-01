@@ -6,11 +6,11 @@ services:
     image: rabbitmq:3.6-management-alpine
     env_file:
       - ${PWD}/environments/${SERVICE_ENV}/rabbitmq.env
+      - ${PWD}/secrets/RABBITMQ_DEFAULT_PASS
     networks:
       - proxy
     environment:
       RABBITMQ_DEFAULT_USER: infra
-      RABBITMQ_DEFAULT_PASS: infra
 
 networks:
   proxy:
