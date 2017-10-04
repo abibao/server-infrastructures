@@ -2,6 +2,19 @@ version: "3.2"
 
 services:
 
+  wp-abibao:
+    image: wordpress:latest
+    env_file:
+      - ${PWD}/environments/${SERVICE_ENV}/www-abibao.env
+      - ${PWD}/secrets/WORDPRESS_DB_PASSWORD
+    environment:
+      WORDPRESS_DB_HOST: mysql
+      WORDPRESS_DB_USER: root
+    networks:
+      - proxy
+    volumes:
+      - volumes-data-www-abibao:/var/www/html
+
   cms-abibao:
     image: abibao/grav
     env_file:
@@ -12,6 +25,11 @@ services:
       - volumes-data-cms-abibao:/var/www/html
 
 volumes:
+
+  volumes-data-www-abibao:
+    driver: local-persist
+    driver_opts:
+      mountpoint: $PWD/volumes/data-persist/www_abibao
 
   volumes-data-cms-abibao:
     driver: local-persist
