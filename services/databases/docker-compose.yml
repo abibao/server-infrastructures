@@ -27,7 +27,7 @@ services:
        MYSQL_USER: infra
 
     postgres:
-      image: library/postgres:9.5-alpine
+      image: library/postgres:9.6-alpine
       env_file:
         - ${PWD}/secrets/POSTGRES_PASSWORD
       environment:
